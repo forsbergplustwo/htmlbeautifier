@@ -421,4 +421,156 @@ describe HtmlBeautifier do
     END
     expect(described_class.beautify(source)).to eq(expected)
   end
+
+  it "indents general self-closing tags" do
+    source = code <<-END
+      <div>
+      <svg>
+      <path d="M150 0 L75 200 L225 200 Z" />
+      <circle cx="50" cy="50" r="40" />
+      </svg>
+      <br>
+      <br/>
+      <p>
+      <foo />
+      </p>
+      </div>
+    END
+    expected = code <<-END
+      <div>
+        <svg>
+          <path d="M150 0 L75 200 L225 200 Z" />
+          <circle cx="50" cy="50" r="40" />
+        </svg>
+        <br>
+        <br/>
+        <p>
+          <foo />
+        </p>
+      </div>
+    END
+    expect(described_class.beautify(source)).to eq(expected)
+  end
+
+  it "removes excess indentation on next line after text" do
+    source = code <<-END
+      Lorem ipsum
+                      <br>
+      Lorem ipsum
+                      <em>
+        Lorem ipsum
+                      </em>
+    END
+    expected = code <<-END
+      Lorem ipsum
+      <br>
+      Lorem ipsum
+      <em>
+        Lorem ipsum
+      </em>
+    END
+    expect(described_class.beautify(source)).to eq(expected)
+  end
+
+  it "indents subsequent lines of multiline text" do
+    source = code <<-END
+      <p>
+      Lorem
+      Lorem
+      Lorem
+      </p>
+    END
+    expected = code <<-END
+      <p>
+        Lorem
+        Lorem
+        Lorem
+      </p>
+    END
+    expect(described_class.beautify(source)).to eq(expected)
+  end
+
+  context "when keep_blank_lines is 0" do
+    it "removes all blank lines" do
+      source = code <<-END
+        <h1>Lorem</h1>
+
+
+
+        <p>Ipsum</p>
+      END
+      expected = code <<-END
+        <h1>Lorem</h1>
+        <p>Ipsum</p>
+      END
+      expect(described_class.beautify(source, keep_blank_lines: 0)).to eq(expected)
+    end
+  end
+
+  context "when keep_blank_lines is 1" do
+    it "removes all blank lines but 1" do
+      source = code <<-END
+        <h1>Lorem</h1>
+
+
+
+        <p>Ipsum</p>
+      END
+      expected = code <<-END
+        <h1>Lorem</h1>
+
+        <p>Ipsum</p>
+      END
+      expect(described_class.beautify(source, keep_blank_lines: 1)).to eq(expected)
+    end
+
+    it "does not add blank lines" do
+      source = code <<-END
+        <h1>Lorem</h1>
+        <div>
+          Ipsum
+          <p>dolor</p>
+        </div>
+      END
+      expect(described_class.beautify(source, keep_blank_lines: 1)).to eq(source)
+    end
+
+    it "does not indent blank lines" do
+      source = code <<-END
+        <div>
+          Ipsum
+
+
+          <p>dolor</p>
+        </div>
+      END
+      expected = code <<-END
+        <div>
+          Ipsum
+
+          <p>dolor</p>
+        </div>
+      END
+      expect(described_class.beautify(source, keep_blank_lines: 1)).to eq(expected)
+    end
+  end
+
+  context "when keep_blank_lines is 2" do
+    it "removes all blank lines but 2" do
+      source = code <<-END
+        <h1>Lorem</h1>
+
+
+
+        <p>Ipsum</p>
+      END
+      expected = code <<-END
+        <h1>Lorem</h1>
+
+
+        <p>Ipsum</p>
+      END
+      expect(described_class.beautify(source, keep_blank_lines: 2)).to eq(expected)
+    end
+  end
 end

@@ -39,6 +39,8 @@ module HtmlBeautifier
        :preformatted_block],
       [%r{<#{HTML_VOID_ELEMENTS}(?: #{ELEMENT_CONTENT})?/?>}om,
        :standalone_element],
+      [%r{<\w+(?: #{ELEMENT_CONTENT})?/>}om,
+       :standalone_element],
       [%r{</#{HTML_BLOCK_ELEMENTS}>}om,
        :close_block_element],
       [%r{<#{HTML_BLOCK_ELEMENTS}(?: #{ELEMENT_CONTENT})?>}om,
@@ -47,9 +49,9 @@ module HtmlBeautifier
        :close_element],
       [%r{<#{ELEMENT_CONTENT}>}om,
        :open_element],
-      [%r{\s*\r?\n\s*}om,
-       :new_line],
-      [%r{[^<]+},
+      [%r{(\s*\r?\n\s*)+}om,
+       :new_lines],
+      [%r{[^<\n]+},
        :text]]
 
     def initialize

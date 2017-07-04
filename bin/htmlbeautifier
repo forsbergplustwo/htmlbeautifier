@@ -11,7 +11,7 @@ end
 
 executable = File.basename(__FILE__)
 
-options = { tab_stops: 2 }
+options = { indent: "  " }
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: #{executable} [options] [file ...]"
   opts.separator <<END
@@ -30,13 +30,31 @@ END
     "-t", "--tab-stops NUMBER", Integer,
     "Set number of spaces per indent (default #{options[:tab_stops]})"
   ) do |num|
-    options[:tab_stops] = num
+    options[:indent] = " " * num
+  end
+  opts.on(
+    "-T", "--tab",
+    "Indent using tabs"
+  ) do
+    options[:indent] = "\t"
+  end
+  opts.on(
+    "-i", "--indent-by NUMBER", Integer,
+    "Indent the output by NUMBER steps (default 0)."
+  ) do |num|
+    options[:initial_level] = num
   end
   opts.on(
     "-e", "--stop-on-errors",
     "Stop when invalid nesting is encountered in the input"
   ) do |num|
     options[:stop_on_errors] = num
+  end
+  opts.on(
+    "-b", "--keep-blank-lines NUMBER", Integer,
+    "Set number of consecutive blank lines"
+  ) do |num|
+    options[:keep_blank_lines] = num
   end
   opts.on(
     "-h", "--help",

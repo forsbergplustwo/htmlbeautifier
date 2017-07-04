@@ -5,15 +5,18 @@ require "htmlbeautifier/liquid_indenter"
 module HtmlBeautifier
   class Builder
     DEFAULT_OPTIONS = {
-      tab_stops: 2,
-      stop_on_errors: false
+      indent: "  ",
+      initial_level: 0,
+      stop_on_errors: false,
+      keep_blank_lines: 0
     }
 
     def initialize(output, options = {})
       options = DEFAULT_OPTIONS.merge(options)
-      @tab = " " * options[:tab_stops]
+      @tab = options[:indent]
       @stop_on_errors = options[:stop_on_errors]
-      @level = 0
+      @level = options[:initial_level]
+      @keep_blank_lines = options[:keep_blank_lines]
       @new_line = false
       @empty = true
       @ie_cc_levels = []
@@ -39,13 +42,14 @@ module HtmlBeautifier
     end
 
     def emit(*strings)
-      @output << ("\n" + @tab * @level) if @new_line && !@empty
+      @output << "\n" if @new_line && !@empty
+      @output << (@tab * @level) if @new_line
       @output << strings.join("")
       @new_line = false
       @empty = false
     end
 
-    def new_line(*)
+    def new_line
       @new_line = true
     end
 
@@ -128,9 +132,15 @@ module HtmlBeautifier
       indent
     end
 
+    def new_lines(*content)
+      blank_lines = content.first.scan(%r{\n}).count - 1
+      blank_lines = [blank_lines, @keep_blank_lines].min
+      @output << "\n" * blank_lines
+      new_line
+    end
+
     def text(t)
-      emit t.chomp
-      new_line if t.end_with?("\n")
+      emit t
     end
   end
 end

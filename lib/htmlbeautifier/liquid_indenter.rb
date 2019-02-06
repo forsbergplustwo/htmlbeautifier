@@ -1,10 +1,11 @@
 module HtmlBeautifier
   class LiquidIndenter
     LIQUID_INDENT_KEYWORDS =
-      %w[if elsif else unless for comment capture raw case when]
+      %w[if elsif else unless for comment capture raw case when break
+         next continue]
     LIQUID_OUTDENT_KEYWORDS =
       %w[elsif else endif endunless endfor endcomment endcapture endraw
-         endcase]
+         endcase break next continue]
     LIQUID_INDENT  = %r{
       ^ ( #{LIQUID_INDENT_KEYWORDS.join("|")} )\b
       | \b ( do | \{ ) ( \s* \| [^\|]+ \| )? $
